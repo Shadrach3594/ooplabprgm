@@ -1,3 +1,5 @@
+package avds;
+
 import java.util.Scanner;
 
 public class StudentGradeCalculator {
@@ -7,12 +9,14 @@ public class StudentGradeCalculator {
 		
 		System.out.println("Enter Student Name:");
 		String name = sc.nextLine();
-		System.out.println("Enter numer of subjects:");
+		System.out.println("Enter number of subjects:");
 		int subjectCount = sc.nextInt();
 		double totalMarks = 0;
 		
 		for(int i = 1; i<=subjectCount; i++) {
-			System.out.println("Enter marks of Subject" +i+ "(out of 100);");
+			System.out.println("Enter the name of subject:");
+			String subjectName = sc.next();
+			System.out.println("Enter marks of Subject" +subjectName+ "(out of 100);");
 			double marks = sc.nextDouble();
 			
 			if(marks<0||marks>100) {
@@ -24,17 +28,17 @@ public class StudentGradeCalculator {
 		}
 		double percentage = totalMarks/subjectCount;
 		
-		char grade;
+		String grade;
 		if(percentage>=90) {
-			grade = 'A';
+			grade = "Excellent";
 		}else if(percentage>=75) {
-			grade = 'B';
+			grade = "Very Good";
 		}else if(percentage>=60) {
-			grade = 'C';
+			grade = "Average";
 		}else if(percentage>=40) {
-			grade = 'D';
+			grade = "Pass";
 		}else{
-			grade = 'F';
+			grade = "Fail";
 			}
 		
 		boolean isPass = (percentage>=40);
