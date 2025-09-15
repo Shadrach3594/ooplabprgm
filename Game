@@ -1,0 +1,175 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Random;
+
+public class HighwayDodger extends JPanel implements ActionListener, KeyListener {
+    // --- Player Car Inner Class ---
+    class PlayerCar {
+        private int x, y, speed;
+        private final int WIDTH = 40, HEIGHT = 60;
+        private boolean left, right;
+
+        public PlayerCar(int x, int y) {
+            this.x = x;
+            this.y = y;
+            this.speed = 5;
+        }
+
+        public void update() {
+            if (left && x > 0) x -= speed;
+            if (right && x < getWidth() - WIDTH) x += speed;
+        }
+
+        public void draw(Graphics g) {
+            g.setColor(Color.BLUE);
+            g.fillRect(x, y, WIDTH, HEIGHT);
+        }
+
+        public Rectangle getBounds() {
+            return new Rectangle(x, y, WIDTH, HEIGHT);
+        }
+
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_LEFT) left = true;
+            if (e.getKeyCode() == KeyEvent.VK_RIGHT) right = true;
+        }
+
+        public void keyReleased(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_LEFT) left = false;
+            if (e.getKeyCode() == KeyEvent.VK_RIGHT) right = false;
+        }
+    }
+
+    // --- Enemy Car Inner Class ---
+    class EnemyCar {
+        private int x, y, speed;
+        private final int WIDTH = 40, HEIGHT = 60;
+
+        public EnemyCar(int x, int y) {
+            this.x = x;
+            this.y = y;
+            this.speed = 5;
+        }
+
+        public void update() {
+            y += speed;
+        }
+
+        public void draw(Graphics g) {
+            g.setColor(Color.RED);
+            g.fillRect(x, y, WIDTH, HEIGHT);
+        }
+
+        public Rectangle getBounds() {
+            return new Rectangle(x, y, WIDTH, HEIGHT);
+        }
+
+        public int getY() {
+            return y;
+        }
+    }
+
+    // --- Main Game Logic ---
+    private Timer timer;
+    private PlayerCar player;
+    private ArrayList<EnemyCar> enemies;
+    private boolean gameOver = false;
+    private int score = 0;
+    private Random random = new Random();
+
+    public HighwayDodger() {
+        setPreferredSize(new Dimension(400, 600));
+        setBackground(Color.DARK_GRAY);
+        setFocusable(true);
+        addKeyListener(this);
+        player = new PlayerCar(180, 500);
+        enemies = new ArrayList<>();
+        timer = new Timer(30, this);
+    }
+
+    public void startGame() {
+        timer.start();
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        if (!gameOver) {
+            player.draw(g);
+            for (EnemyCar enemy : enemies) {
+                enemy.draw(g);
+            }
+
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Arial", Font.BOLD, 20));
+            g.drawString("Score: " + score, 10, 20);
+        } else {
+            g.setColor(Color.RED);
+            g.setFont(new Font("Arial", Font.BOLD, 36));
+            g.drawString("GAME OVER", 100, 250);
+            g.setFont(new Font("Arial", Font.PLAIN, 20));
+            g.drawString("Final Score: " + score, 140, 300);
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (!gameOver) {
+            player.update();
+
+            if (random.nextInt(20) == 0) {
+                enemies.add(new EnemyCar(random.nextInt(360), -100));
+            }
+
+            Iterator<EnemyCar> iterator = enemies.iterator();
+            while (iterator.hasNext()) {
+                EnemyCar enemy = iterator.next();
+                enemy.update();
+
+                if (enemy.getY() > getHeight()) {
+                    iterator.remove();
+                    score++;
+                }
+
+                if (enemy.getBounds().intersects(player.getBounds())) {
+                    gameOver = true;
+                    timer.stop();
+                }
+            }
+
+            repaint();
+        }
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        player.keyPressed(e);
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        player.keyReleased(e);
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {}
+
+    // --- Main Method to Launch the Game ---
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("🚗 Highway Dodger");
+        HighwayDodger gamePanel = new HighwayDodger();
+
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setResizable(false);
+        frame.add(gamePanel);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+
+        gamePanel.startGame();
+    }
+}
