@@ -1,0 +1,78 @@
+package avds;
+
+import java.util.Scanner;
+
+public class SimpleATM {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        double balance = 1000.0;
+        int choice;
+        boolean exit = false;
+
+        do {
+            System.out.println("\n=== ATM Menu ===");
+            System.out.println("1. Check Balance");
+            System.out.println("2. Deposit Money");
+            System.out.println("3. Withdraw Money");
+            System.out.println("4. Exit");
+            System.out.print("Enter Your Choice: ");
+
+            choice = sc.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.println("Your balance: ₹" + balance);
+                    if (balance < 500) {
+                        System.out.println("Warning: Your balance is below ₹500!");
+                    }
+                    break;
+
+                case 2:
+                    System.out.print("Enter amount to deposit: ₹");
+                    double deposit = sc.nextDouble();
+                    if (deposit > 0) {
+                        balance += deposit;
+                        System.out.println("Deposited ₹" + deposit + ". New Balance: ₹" + balance);
+                    } else {
+                        System.out.println("Invalid deposit amount!");
+                    }
+                    break;
+
+                case 3:
+                    System.out.print("Enter amount to withdraw: ₹");
+                    double withdraw = sc.nextDouble();
+                    if (withdraw > 0) {
+                        if (withdraw <= balance) {
+                            balance -= withdraw;
+                            System.out.println("Withdrawn ₹" + withdraw + ". Remaining balance: ₹" + balance);
+                            if (balance < 500) {
+                                System.out.println("Warning: Your balance is below ₹500!");
+                            }
+                        } else {
+                            System.out.println("Insufficient balance!");
+                        }
+                    } else {
+                        System.out.println("Invalid withdrawal amount!");
+                    }
+                    break;
+
+                case 4:
+                    System.out.print("Are you sure you want to exit? (Y/N): ");
+                    char confirmExit = sc.next().charAt(0);
+                    if (confirmExit == 'Y' || confirmExit == 'y') {
+                        System.out.println("Thank you for using the ATM. Goodbye!");
+                        exit = true;
+                    } else {
+                        System.out.println("Exit cancelled. Returning to main menu.");
+                    }
+                    break;
+
+                default:
+                    System.out.println("Invalid choice! Please try again.");
+            }
+
+        } while (!exit);
+
+        sc.close();
+    }
+}
